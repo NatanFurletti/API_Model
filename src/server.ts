@@ -1,16 +1,21 @@
-import app from "./app";
-import { PrismaClient } from "@prisma/client";
+import app from "./app.js";
+import prisma from "./lib/prisma.js";
 
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, async () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-
+// Testar conexão com o banco antes de subir o servidor
+async function startServer() {
   try {
     await prisma.$connect();
-    console.log("✅ Banco de dados conectado com sucesso!");
+    console.log("✅ Banco de dados conectado!");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    });
   } catch (error) {
-    console.error("❌ Erro ao conectar ao banco de dados:", error);
+    console.error("❌ Erro ao conectar ao banco:", error);
+    process.exit(1); // Encerra o processo se falhar
   }
-});
+}
+
+startServer();
